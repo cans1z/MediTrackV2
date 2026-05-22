@@ -1,0 +1,60 @@
+# ========================
+# .NET / ASP.NET Core
+# ========================
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Переменные окружения — НИКОГДА не коммить
+.env
+.env.local
+appsettings.Development.json
+
+# ========================
+# JetBrains Rider
+# ========================
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# ========================
+# Visual Studio (на случай если откроешь там)
+# ========================
+.vs/
+*.rsuser
+
+# ========================
+# База данных
+# ========================
+*.db
+*.sqlite
+*.sqlite3
+
+# ========================
+# OS
+# ========================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ========================
+# Логи
+# ========================
+*.log
+logs/

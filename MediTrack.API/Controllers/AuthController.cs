@@ -1,7 +1,6 @@
 ﻿using MediTrack.API.DTOs;
-using MediTrack.API.Extensions;
+using MediTrack.API.Exceptions;
 using MediTrack.API.Interfaces;
-using MediTrack.API.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediTrack.API.Controllers;
@@ -11,14 +10,12 @@ namespace MediTrack.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-    private readonly ITokenService _tokenService;
     
-    public AuthController(IAuthService authService, ITokenService tokenService)
+    public AuthController(IAuthService authService)
     {
         _authService = authService;
-        _tokenService = tokenService;
     }
-
+    
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     {
@@ -38,7 +35,7 @@ public class AuthController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-
+    
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {

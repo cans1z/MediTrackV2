@@ -5,6 +5,6 @@ namespace MediTrack.API.Interfaces;
 
 public interface IAuthService
 {
-    Task<User> Register(RegisterDto dto);
+    Task<UserResponseDto> Register(RegisterDto dto);
     Task<string> Login(LoginDto dto);
 }

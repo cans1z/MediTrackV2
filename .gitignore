@@ -58,3 +58,6 @@ $RECYCLE.BIN/
 # ========================
 *.log
 logs/
+MediTrack.API/global.json
+MediTrack.API/MediTrack.API.csproj.DotSettings
+MediTrack.API/MediTrack.API.csproj

@@ -1,4 +1,4 @@
-﻿namespace MediTrack.API.Extensions;
+﻿namespace MediTrack.API.Exceptions;
 
 public class ConflictException : Exception
 {

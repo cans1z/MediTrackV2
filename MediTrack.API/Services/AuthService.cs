@@ -1,6 +1,6 @@
 ﻿using MediTrack.API.Data;
 using MediTrack.API.DTOs;
-using MediTrack.API.Extensions;
+using MediTrack.API.Exceptions;
 using MediTrack.API.Interfaces;
 using MediTrack.API.Models;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +18,8 @@ public class AuthService : IAuthService
         _tokenService = tokenService;
     }
     
-    public async Task<User> Register(RegisterDto dto)
+    
+    public async Task<UserResponseDto> Register(RegisterDto dto)
     {
         var userExists = await _context.Users
             .AnyAsync(u => u.UserName.ToLower() == dto.Name.ToLower() || u.Email.ToLower() == dto.Email.ToLower());
@@ -40,8 +41,15 @@ public class AuthService : IAuthService
         
         await _context.Users.AddAsync(newUser);
         await _context.SaveChangesAsync();
-        
-        return newUser;
+
+        var response = new UserResponseDto
+        {
+            Id = newUser.Id,
+            UserName = newUser.UserName,
+            Email = newUser.Email,
+            Role = newUser.Role
+        };
+        return response;
     }
 
     public async Task<string> Login(LoginDto dto)

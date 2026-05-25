@@ -6,6 +6,7 @@ using MediTrack.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace MediTrack.API;
 
@@ -15,7 +16,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        //подключание DbContext через DI
+        //подключение DbContext через DI
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
             var provider = builder.Configuration["DatabaseProvider"];
@@ -38,6 +39,10 @@ public class Program
         //services
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
+        builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<IMedicationService, MedicationService>();
+        
+        //JWT аутентификация
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -53,11 +58,36 @@ public class Program
                     ValidateLifetime = false // пока токен вечный
                 };
             });
-        
 
-        //swagger
+        //swagger с авторизацией
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Введи JWT токен в формате: Bearer {токен}"
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
 
         var app = builder.Build();
 
@@ -69,7 +99,9 @@ public class Program
 
         app.UseAuthentication();
         app.UseAuthorization();
+        
         app.MapControllers();
+        
         app.Run();
     }
 }

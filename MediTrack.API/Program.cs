@@ -41,6 +41,7 @@ public class Program
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IMedicationService, MedicationService>();
+        builder.Services.AddScoped<IPrescriptionService, PrescritptionService>();
         
         //JWT аутентификация
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

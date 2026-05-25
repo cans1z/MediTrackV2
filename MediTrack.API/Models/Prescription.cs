@@ -6,10 +6,11 @@ public class Prescription
 {
     public int Id { get; set; }
     public string Dosage { get; set; } =  string.Empty;
-    public int Frequency { get; set; } =  0;
+    public Frequency Frequency { get; set; } = Frequency.OnceADay;
     public DateTime StartDate { get; set; }
-    public int Period { get; set; } =  0;
+    public int Period { get; set; }
     public bool IsFlexible { get; set; } =  false;
+    public bool IsActive { get; set; } = true;
     public string Comment { get; set; } =  string.Empty;
     
     public int DoctorId { get; set; }
@@ -22,4 +23,14 @@ public class Prescription
     
     public int MedicationId { get; set; }
     public Medication Medication { get; set; } = null!;
+    
+}
+
+public enum Frequency
+{
+    OnceADay,
+    TwiceADay,
+    ThriceADay,
+    EveryOtherDay,
+    Weekly
 }

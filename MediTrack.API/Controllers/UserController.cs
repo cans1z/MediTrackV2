@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using MediTrack.API.DTOs;
 using MediTrack.API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ public class UserController : ControllerBase
     
     [Authorize]
     [HttpGet("me")]
-    public async Task<IActionResult> GetUser()
+    public async Task<ActionResult<UserResponseDto>> GetUser()
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var user = await _userService.GetUser(userId);

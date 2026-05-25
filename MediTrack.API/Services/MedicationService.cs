@@ -48,6 +48,9 @@ public class MedicationService : IMedicationService
             })
             .ToListAsync();
         
+        if (response == null)
+            throw new NotFoundException("Medications not found");
+        
         return response;
     }
     

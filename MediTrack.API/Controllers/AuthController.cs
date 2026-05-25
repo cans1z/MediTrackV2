@@ -17,14 +17,14 @@ public class AuthController : ControllerBase
     }
     
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+    public async Task<ActionResult<UserResponseDto>> Register([FromBody] RegisterDto dto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         try
         {
             var user = await _authService.Register(dto);
-            return CreatedAtAction(nameof(Register), user);
+            return Created(string.Empty, user);;
         }
         catch (ConflictException e)
         {
@@ -37,7 +37,7 @@ public class AuthController : ControllerBase
     }
     
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto dto)
+    public async Task<ActionResult<string>> Login([FromBody] LoginDto dto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);

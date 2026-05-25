@@ -19,7 +19,7 @@ public class MedicationController : ControllerBase
    }
 
    [HttpGet("{id}")]
-   public async Task<IActionResult> Get(int id)
+   public async Task<ActionResult<MedicationDto>> GetMedication(int id)
    {
       if (!ModelState.IsValid)
          return BadRequest(ModelState);
@@ -38,16 +38,15 @@ public class MedicationController : ControllerBase
       }
    }
 
-   [Authorize]
    [HttpGet]
-   public async Task<IActionResult> GetAll()
+   public async Task<ActionResult<List<MedicationDto>>> GetAllMedications()
    {
       if (!ModelState.IsValid)
          return BadRequest(ModelState);
       try
       {
-         var medication = await _medicationService.GetMedications();
-         return Ok(medication);
+         var medications = await _medicationService.GetMedications();
+         return Ok(medications);
       }
       catch (NotFoundException e)
       {
@@ -59,16 +58,16 @@ public class MedicationController : ControllerBase
       }
    }
 
-   [Authorize(Roles = "Administrator")]
+   [Authorize(Roles = "Administrator")] 
    [HttpPost]
-   public async Task<IActionResult> Add([FromBody] MedicationDto dto)
+   public async Task<ActionResult<MedicationDto>> AddMedication([FromBody] MedicationDto dto) 
    {
       if (!ModelState.IsValid)
          return BadRequest(ModelState);
       try
       {
          var medication = await _medicationService.AddMedication(dto);
-         return CreatedAtAction(nameof(Get), new { id = medication.Id }, medication);
+         return CreatedAtAction(nameof(GetMedication), new { id = medication.Id }, medication);
       }
       catch (ConflictException e)
       {
@@ -82,7 +81,7 @@ public class MedicationController : ControllerBase
 
    [Authorize(Roles = "Administrator")]
    [HttpPut("{id}")]
-   public async Task<IActionResult> Update(int id, [FromBody] MedicationDto dto)
+   public async Task<ActionResult<MedicationDto>> EditMedication(int id, [FromBody] MedicationDto dto)
    {
       if (!ModelState.IsValid)
          return BadRequest(ModelState);
@@ -103,7 +102,7 @@ public class MedicationController : ControllerBase
 
    [Authorize(Roles = "Administrator")]
    [HttpDelete("{id}")]
-   public async Task<IActionResult> Delete(int id)
+   public async Task<IActionResult> DeleteMedication(int id) 
    {
       if (!ModelState.IsValid)
          return BadRequest(ModelState);

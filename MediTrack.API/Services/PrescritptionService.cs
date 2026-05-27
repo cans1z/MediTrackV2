@@ -16,15 +16,19 @@ public class PrescritptionService : IPrescriptionService
         _context = context;
     }
 
-
-    public async Task<PrescriptionResponseDto> GetPrescription(int prescriptionId)
+    public async Task<PrescriptionResponseDto> GetPrescription(int prescriptionId, int userId, UserRole role)
     {
-        var prescription = await _context.Prescriptions
+        var query = _context.Prescriptions
             .Include(p => p.Patient)
             .Include(p => p.Doctor)
             .Include(p => p.Medication)
-            .FirstOrDefaultAsync(p => p.Id == prescriptionId);
+            .AsQueryable();
+        
+        if (role != UserRole.Administrator)
+            query = query.Where(i => i.DoctorId == userId || i.PatientId == userId);
 
+        var prescription = await query.FirstOrDefaultAsync(i => i.Id == prescriptionId);
+        
         if (prescription == null)
             throw new NotFoundException("Prescription not found");
 
@@ -45,33 +49,44 @@ public class PrescritptionService : IPrescriptionService
         return response;
     }
 
-    public async Task<List<PrescriptionResponseDto>> GetPrescriptions()
+    public async Task<List<PrescriptionResponseDto>> GetPrescriptions(int userId, UserRole role)
     {
-        var response = await _context.Prescriptions
+        var query = _context.Prescriptions
             .Include(p => p.Patient)
             .Include(p => p.Doctor)
             .Include(p => p.Medication)
-            .Where(p => p.IsActive)
-            .Select(p => new PrescriptionResponseDto
-            {
-                Id = p.Id,
-                Dosage = p.Dosage,
-                PatientName = p.Patient.UserName,
-                MedicationName = p.Medication.Name,
-                DoctorName = p.Doctor.UserName,
-                StartDate = p.StartDate,
-                Period = p.Period,
-                Frequency = p.Frequency,
-                IsFlexible = p.IsFlexible,
-                Comment = p.Comment
-            })
-            .ToListAsync();
+            .Where(p => p.IsActive);
+
+        if (role == UserRole.Patient)
+            query = query.Where(p => p.PatientId == userId);
+        else if (role == UserRole.Doctor)
+            query = query.Where(p => p.DoctorId == userId);
         
-        return response;
+        return await query.Select(p => new PrescriptionResponseDto
+        {
+            Id = p.Id,
+            Dosage = p.Dosage,
+            PatientName = p.Patient.UserName,
+            MedicationName = p.Medication.Name,
+            DoctorName = p.Doctor.UserName,
+            StartDate = p.StartDate,
+            Period = p.Period,
+            Frequency = p.Frequency,
+            IsFlexible = p.IsFlexible,
+            Comment = p.Comment
+        }).ToListAsync();
     }
 
     public async Task<PrescriptionResponseDto> AddPrescription(PrescriptionDto dto, int doctorId)
     {
+        var patient = await _context.Users.AnyAsync(u => u.Id == dto.PatientId);
+        if (!patient)
+            throw new NotFoundException("Patient not found");
+
+        var medication = await _context.Medications.AnyAsync(m => m.Id == dto.MedicationId && !m.IsDeleted);
+        if (!medication)
+            throw new NotFoundException("Medication not found");
+        
         var prescription = new Prescription
         {
             Dosage = dto.Dosage,
@@ -94,6 +109,7 @@ public class PrescritptionService : IPrescriptionService
             .Include(p => p.Medication)
             .FirstOrDefaultAsync(p => p.Id == prescription.Id);
         
+        
         if (created == null)
             throw new NotFoundException("Prescription not found after creation");
         
@@ -114,8 +130,16 @@ public class PrescritptionService : IPrescriptionService
         return response;
     }
 
-    public async Task<PrescriptionResponseDto> EditPrescription(int prescriptionId, PrescriptionDto dto)
+    public async Task<PrescriptionResponseDto> EditPrescription(int prescriptionId, PrescriptionDto dto, int doctorId)
     {
+        var patient = await _context.Users.AnyAsync(u => u.Id == dto.PatientId);
+        if (!patient)
+            throw new NotFoundException("Patient not found");
+
+        var medication = await _context.Medications.AnyAsync(m => m.Id == dto.MedicationId && !m.IsDeleted);
+        if (!medication)
+            throw new NotFoundException("Medication not found");
+        
         var prescription = await _context.Prescriptions
             .Include(p => p.Patient)
             .Include(p => p.Doctor)
@@ -124,6 +148,9 @@ public class PrescritptionService : IPrescriptionService
         
         if (prescription == null)
             throw new NotFoundException("Prescription not found");
+        
+        if (prescription.DoctorId != doctorId)
+            throw new ForbiddenException("You can't edit this prescription");
         
         prescription.Dosage = dto.Dosage;
         prescription.PatientId = dto.PatientId;

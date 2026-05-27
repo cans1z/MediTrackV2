@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using MediTrack.API.Data;
 using MediTrack.API.Interfaces;
+using MediTrack.API.Middleware;
 using MediTrack.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,7 @@ public class Program
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IMedicationService, MedicationService>();
         builder.Services.AddScoped<IPrescriptionService, PrescritptionService>();
+        builder.Services.AddScoped<IIntakeService, IntakeService>();
         
         //JWT аутентификация
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -92,6 +94,8 @@ public class Program
 
         var app = builder.Build();
 
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
+        
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();

@@ -17,7 +17,9 @@ public class UserService : IUserService
     }
     public async Task<UserResponseDto> GetUser(int userId)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        var user = await _context.Users
+            .Where(u => u.IsDeleted == false)
+            .FirstOrDefaultAsync(u => u.Id == userId);
         
         if (user == null) throw new NotFoundException("User not found");
         
@@ -30,4 +32,5 @@ public class UserService : IUserService
         };
         return response;
     }
+    
 }

@@ -21,103 +21,39 @@ public class MedicationController : ControllerBase
    [HttpGet("{id}")]
    public async Task<ActionResult<MedicationDto>> GetMedication(int id)
    {
-      if (!ModelState.IsValid)
-         return BadRequest(ModelState);
-      try
-      {
-         var medication = await _medicationService.GetMedication(id);
-         return Ok(medication);
-      }
-      catch (NotFoundException e)
-      {
-         return NotFound(e.Message);
-      }
-      catch (Exception e)
-      {
-         return BadRequest(e.Message);
-      }
+      var medication = await _medicationService.GetMedication(id);
+      return Ok(medication);
    }
 
    [HttpGet]
    public async Task<ActionResult<List<MedicationDto>>> GetAllMedications()
    {
-      if (!ModelState.IsValid)
-         return BadRequest(ModelState);
-      try
-      {
-         var medications = await _medicationService.GetMedications();
-         return Ok(medications);
-      }
-      catch (NotFoundException e)
-      {
-         return NotFound(e.Message);
-      }
-      catch (Exception e)
-      {
-         return BadRequest(e.Message);
-      }
+      var medications = await _medicationService.GetMedications();
+      return Ok(medications);
    }
 
-   [Authorize(Roles = "Administrator")] 
+   
    [HttpPost]
+   [Authorize(Roles = "Administrator")] 
    public async Task<ActionResult<MedicationDto>> AddMedication([FromBody] MedicationDto dto) 
    {
-      if (!ModelState.IsValid)
-         return BadRequest(ModelState);
-      try
-      {
-         var medication = await _medicationService.AddMedication(dto);
-         return CreatedAtAction(nameof(GetMedication), new { id = medication.Id }, medication);
-      }
-      catch (ConflictException e)
-      {
-         return Conflict(e.Message);
-      }
-      catch (Exception e)
-      {
-         return BadRequest(e.Message);
-      }
+      var medication = await _medicationService.AddMedication(dto);
+      return CreatedAtAction(nameof(GetMedication), new { id = medication.Id }, medication);
    }
 
    [Authorize(Roles = "Administrator")]
    [HttpPut("{id}")]
    public async Task<ActionResult<MedicationDto>> EditMedication(int id, [FromBody] MedicationDto dto)
    {
-      if (!ModelState.IsValid)
-         return BadRequest(ModelState);
-      try
-      {
-         var medication = await _medicationService.EditMedication(id, dto);
-         return Ok(medication);
-      }
-      catch (ConflictException e)
-      {
-         return Conflict(e.Message);
-      }
-      catch (Exception e)
-      {
-         return BadRequest(e.Message);
-      }
+      var medication = await _medicationService.EditMedication(id, dto);
+      return Ok(medication);
    }
 
    [Authorize(Roles = "Administrator")]
    [HttpDelete("{id}")]
    public async Task<IActionResult> DeleteMedication(int id) 
    {
-      if (!ModelState.IsValid)
-         return BadRequest(ModelState);
-      try
-      {
-         await _medicationService.DeleteMedication(id);
-         return NoContent();
-      }
-      catch (NotFoundException e)
-      {
-         return NotFound(e.Message);
-      }
-      catch (Exception e)
-      {
-         return BadRequest(e.Message);
-      }
+      await _medicationService.DeleteMedication(id);
+      return NoContent();
    }
 }

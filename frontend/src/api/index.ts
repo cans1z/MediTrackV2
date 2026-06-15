@@ -1,17 +1,7 @@
-import { BaseHttpClient } from "@/shared/http/axios";
-import type { components } from "../../schema"; 
+import { BaseHttpClient } from '@/shared/http/axios';
 
-type Medication = components["schemas"]["MedicationDto"];
+// Создаем единственный экземпляр клиента для всего приложения
+const httpClient = new BaseHttpClient();
 
-class ApiService extends BaseHttpClient {
-  getMedications() {
-    return this.get<Medication[]>("/api/medications");
-  }
-
-  // Метод для создания нового лекарства
-  createMedication(data: Medication) {
-    return this.post<Medication>("/api/medications", data);
-  }
-}
-
-export const api = new ApiService();
+// Экспортируем именно свойство http (инстанс axios)
+export const $api = httpClient.http;

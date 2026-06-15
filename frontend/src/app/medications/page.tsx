@@ -1,57 +1,53 @@
-import type { FC } from 'react';
-import { api } from '../../api';
-import type { components } from "../../../schema"; 
+'use client' // это нужно чтобы использовать useState и useEffect
 
-type MedicationDto = components["schemas"]["MedicationDto"];
+import { useEffect, useState } from 'react'
+import { medicationApi } from '@/api/medications/medication.api'
+import type { MedicationResponseDto } from '@/entities/medications/medication.dto'
 
-const MedicationsPage: FC = async () => {
-  // ЯВНО указываем тип для массива медикаментов: MedicationDto[]
-  let medications: MedicationDto[] = [];
-  let error: string | null = null;
+export default function MedicationsPage() {
+  const [medications, setMedications] = useState<MedicationResponseDto[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  try {
-    const response = await api.getMedications();
-    // На всякий случай проверяем, что бэкенд прислал данные
-    medications = response.data || []; 
-  } catch (err) {
-    console.error("Ошибка при получении лекарств:", err);
-    error = "Не удалось загрузить список медикаментов. Проверь, запущен ли .NET бэкенд.";
-  }
+  useEffect(() => {
+    const fetchMedications = async () => {
+      try {
+        const data = await medicationApi.getAll()
+        setMedications(data)
+      } catch {
+        setError('Не удалось загрузить препараты')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchMedications()
+  }, [])
 
-  return (
-    <main className="max-w-7xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Каталог медикаментов</h1>
+  if (loading) return <div>Загрузка...</div>
+  if (error) return <div>{error}</div>
 
-      {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-md mb-6">
-          {error}
-        </div>
-      )}
+ return (
+  <div className="max-w-7xl mx-auto p-6">
+    <h1 className="text-2xl font-bold mb-6">Препараты</h1>
 
-      {!error && medications.length === 0 && (
-        <p className="text-gray-500">В базе данных пока нет ни одного лекарства.</p>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Теперь TypeScript точно знает типы med и idx автоматически! */}
-        {medications.map((med, idx) => (
-          <div key={idx} className="border rounded-lg p-4 shadow-sm bg-card">
-            <h2 className="text-xl font-semibold text-blue-600 mb-1">
-              {med.name}
-            </h2>
-            <p className="text-sm text-gray-400 mb-3">
-              Форма: {med.dosageForm}
-            </p>
-            {med.description && (
-              <p className="text-sm text-gray-600">
-                {med.description}
-              </p>
-            )}
-          </div>
+    <table className="w-full">
+      <thead>
+        <tr className="border-b">
+          <th className="text-left py-3 px-4">Название</th>
+          <th className="text-left py-3 px-4">Описание</th>
+          <th className="text-left py-3 px-4">Форма выпуска</th>
+        </tr>
+      </thead>
+      <tbody>
+        {medications.map(m => (
+          <tr key={m.id} className="border-b hover:bg-muted/50">
+            <td className="py-3 px-4">{m.name}</td>
+            <td className="py-3 px-4">{m.description}</td>
+            <td className="py-3 px-4">{m.dosageForm}</td>
+          </tr>
         ))}
-      </div>
-    </main>
-  );
-};
-
-export default MedicationsPage;
+      </tbody>
+    </table>
+  </div>
+)
+}

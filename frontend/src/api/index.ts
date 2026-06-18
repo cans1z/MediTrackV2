@@ -1,7 +1,4 @@
-import { BaseHttpClient } from '@/shared/http/axios';
+import { medicationApi } from './medications/medication.api';
+import { authApi } from './auth/auth.api';
 
-// Создаем единственный экземпляр клиента для всего приложения
-const httpClient = new BaseHttpClient();
-
-// Экспортируем именно свойство http (инстанс axios)
-export const $api = httpClient.http;
+export const api = {medication: medicationApi, auth: authApi};

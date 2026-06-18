@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation' // Нужен для редиректа после логина
-import { authApi } from '@/api/auth/auth.api'
-import type { LoginRequestDto, LoginResponseDto } from '@/entities/auth/auth.dto';
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext' 
+import type { LoginRequestDto } from '@/entities/auth/auth.dto'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { login } = useAuth()
 
-  // 1. Стейт для данных формы
   const [formData, setFormData] = useState<LoginRequestDto>({
     userName: '',
     password: ''
@@ -17,21 +17,14 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // 2. Функция отправки данных на бэк
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault() // Отменяем перезагрузку страницы браузером
+    e.preventDefault()
     setLoading(true)
     setError(null)
 
     try {
-      // Вызываем твой метод из auth.api.ts
-      const user = await authApi.login(formData)
+      await login(formData)
       
-      localStorage.setItem('access_token', user) // добавь эту строку
-      
-      console.log('Успешный вход, юзер:', user)
-      
-      // Перенаправляем пользователя на страницу с лекарствами после успешного входа
       router.push('/medications') 
     } catch (err) {
       setError('Неверный логин или пароль')
@@ -51,7 +44,6 @@ export default function LoginPage() {
             type="text"
             required
             value={formData.userName}
-            // Обновляем только поле userName в стейте
             onChange={e => setFormData(prev => ({ ...prev, userName: e.target.value }))}
             style={{ width: '100%', padding: '8px', color: 'black' }}
           />
@@ -63,7 +55,6 @@ export default function LoginPage() {
             type="password"
             required
             value={formData.password}
-            // Обновляем только поле password в стейте
             onChange={e => setFormData(prev => ({ ...prev, password: e.target.value }))}
             style={{ width: '100%', padding: '8px', color: 'black' }}
           />

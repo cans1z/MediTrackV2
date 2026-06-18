@@ -1,28 +1,32 @@
-import { $api } from '@/api'; 
 import type { MedicationRequestDto, MedicationResponseDto } from '@/entities/medications/medication.dto';
+import { BaseHttpClient } from '@/shared/http/axios';
+import { APIResponse } from '@/shared/types';
 
-export const medicationApi = {
-  getById: async (id: number): Promise<MedicationResponseDto> => {
-    const response = await $api.get<MedicationResponseDto>(`/medications/${id}`);
-    return response.data;
-  },
+class MedicationApi extends BaseHttpClient {
+  public getMedicationById = async (id: number): APIResponse<MedicationResponseDto> => {
+    const response = await this.get<MedicationResponseDto>(`/medications/${id}`);
+    return response;
+  };
 
-  getAll: async (): Promise<MedicationResponseDto[]> => {
-    const response = await $api.get<MedicationResponseDto[]>('/medications');
-    return response.data;
-  },
+  public getAllMedications = async (): APIResponse<MedicationResponseDto[]> => {
+    const response = await this.get<MedicationResponseDto[]>('/medications');
+    return response;
+  };
 
-  create: async (dto: MedicationRequestDto): Promise<MedicationResponseDto> => {
-    const response = await $api.post<MedicationResponseDto>('/medications', dto);
-    return response.data;
-  },
+  public createMedication = async (dto: MedicationRequestDto): APIResponse<MedicationResponseDto> => {
+    const response = await this.post<MedicationResponseDto>('/medications', dto);
+    return response;
+  };
 
-  update: async (id: number, dto: MedicationRequestDto): Promise<MedicationResponseDto> => {
-    const response = await $api.put<MedicationResponseDto>(`/medications/${id}`, dto);
-    return response.data;
-  },
+  public updateMedication = async (id: number, dto: MedicationRequestDto): APIResponse<MedicationResponseDto> => {
+    const response = await this.put<MedicationResponseDto>(`/medications/${id}`, dto);
+    return response;
+  };
 
-  delete: async (id: number): Promise<void> => {
-    await $api.delete<void>(`/medications/${id}`);
-  },
-};
+  public deleteMedication = async (id: string): Promise<void> => {
+    await this.delete(`/medications/${id}`);
+  }
+} 
+
+export const medicationApi = new MedicationApi();
+

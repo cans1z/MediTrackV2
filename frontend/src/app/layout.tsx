@@ -4,6 +4,7 @@ import "./globals.css";
 // 1. Импортируем провайдер
 import { AuthProvider } from '@/contexts/AuthContext'; 
 import { Header } from "@/widgets/Header";
+import { Toaster } from 'sonner'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
         <AuthProvider>
           <Header />
           {children}
+          <Toaster />
         </AuthProvider>
       </body>
     </html>

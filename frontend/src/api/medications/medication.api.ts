@@ -23,7 +23,7 @@ class MedicationApi extends BaseHttpClient {
     return response;
   };
 
-  public deleteMedication = async (id: string): Promise<void> => {
+  public deleteMedication = async (id: number): Promise<void> => {
     await this.delete(`/medications/${id}`);
   }
 } 

@@ -1,38 +1,40 @@
 import type { Navigation, NavigationItem } from "../types";
 
-import { Plus } from "lucide-react";
+import { Calendar, FileText, LayoutDashboard, Pill, Plus } from "lucide-react";
 
 const GlobalNavigation = {
-  pizda: {
-    href: "",
-    label: "Пизда",
-    icon: Plus,
+  dashboard: {
+    href: "/dashboard",
+    label: "Главная",
+    icon: LayoutDashboard,
   },
-  pizda1: {
-    href: "",
-    label: "Пизда",
-    icon: Plus,
+  medications: {
+    href: "/medications",
+    label: "Медикаменты",
+    icon: Pill,
   },
-  pizda2: {
-    href: "",
-    label: "Пизда",
-    icon: Plus,
+  prescriptions: {
+    href: "/prescriptions",
+    label: "Рецепты",
+    icon: FileText,
   },
-  pizda3: {
-    href: "",
-    label: "Пизда",
-    icon: Plus,
+  intakes: {
+    href: "/intakes",
+    label: "График приема",
+    icon: Calendar,
   },
 };
 
 export const HeaderNavigation: Navigation = [
-  GlobalNavigation.pizda,
-  GlobalNavigation.pizda1,
-  GlobalNavigation.pizda2,
+  GlobalNavigation.dashboard,
+  GlobalNavigation.medications,
+  GlobalNavigation.prescriptions,
+  GlobalNavigation.intakes
 ];
 
 export const SidebarNavigation: Navigation = [
-  GlobalNavigation.pizda,
-  GlobalNavigation.pizda,
-  GlobalNavigation.pizda,
+  GlobalNavigation.dashboard,
+  GlobalNavigation.medications,
+  GlobalNavigation.prescriptions,
+  GlobalNavigation.intakes
 ];

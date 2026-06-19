@@ -1,4 +1,11 @@
 # ========================
+# Frontend Isolation (Корень)
+# ========================
+node_modules/
+bun.lock
+package.json
+
+# ========================
 # .NET / ASP.NET Core
 # ========================
 bin/
@@ -19,16 +26,12 @@ artifacts/
 appsettings.Development.json
 
 # ========================
-# JetBrains Rider
+# IDEs (Rider / VS)
 # ========================
 .idea/
 *.iml
 *.ipr
 *.iws
-
-# ========================
-# Visual Studio (на случай если откроешь там)
-# ========================
 .vs/
 *.rsuser
 
@@ -42,22 +45,17 @@ appsettings.Development.json
 # ========================
 # OS
 # ========================
-
-# macOS
 .DS_Store
 .AppleDouble
 .LSOverride
-
-# Windows
 Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
 # ========================
-# Логи
+# Логи и специфичные файлы
 # ========================
 *.log
 logs/
 MediTrack.API/global.json
 MediTrack.API/MediTrack.API.csproj.DotSettings
-MediTrack.API/MediTrack.API.csproj

@@ -2,7 +2,7 @@ export interface UserResponseDto {
   id: number
   userName: string
   email: string
-  role: string
+  role: UserRole
   isBanned: boolean
 }
 
@@ -10,7 +10,7 @@ export interface CreateUserDto {
   userName: string
   email: string
   password: string
-  role: string
+  role: UserRole
 }
 
 export interface RegisterDto {
@@ -18,3 +18,8 @@ export interface RegisterDto {
   email: string
   password: string
 }
+
+export type UserRole = 
+  | 'Administrator'
+  | 'Doctor' 
+  | 'Patient'

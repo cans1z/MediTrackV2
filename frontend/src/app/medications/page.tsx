@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
-import MedicationForm from '@/components/medications/MedicationForm' // поправил путь в соответствии с вашим комментарием
+import MedicationForm from '@/components/medications/MedicationForm'
 import { toast } from 'sonner'
 
 // Импорты shadcn/ui компонентов
@@ -71,7 +71,7 @@ export default function MedicationsPage() {
     if (!isConfirmed) return
 
     try {
-      // Предполагается метод deleteMedication(id) в вашем API
+
       await api.medication.deleteMedication(id)
       await fetchMedications()
       toast.success('Препарат успешно удален')

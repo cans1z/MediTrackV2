@@ -7,12 +7,16 @@ import { Button } from '@/shared/ui/button'
 import { api } from '@/api' 
 import { useAuth } from '@/contexts/AuthContext'
 import type { UserResponseDto } from '@/entities/user/user.dto'
-import { UserForm } from '@/components/users/UserForm' // Импортируем нашу форму
+import { UserForm } from '@/components/users/UserForm'
+import AppPagination from '@/components/Pagination' // Твой компонент
+
+const ITEMS_PER_PAGE = 10
 
 export default function UsersPage() {
   const [users, setUsers] = useState<UserResponseDto[]>([])
   const [loading, setLoading] = useState<boolean>(false)
-  const [isFormOpen, setIsFormOpen] = useState<boolean>(false) // Стейт для модалки
+  const [isFormOpen, setIsFormOpen] = useState<boolean>(false)
+  const [currentPage, setCurrentPage] = useState<number>(1) 
   const { user: currentUser } = useAuth()
 
   const isAdmin = currentUser?.role === 'Administrator'
@@ -34,18 +38,24 @@ export default function UsersPage() {
     fetchUsers()
   }, [])
 
-  // Вызывается при выборе новой роли в селекте
+  useEffect(() => {
+    const totalPages = Math.ceil(users.length / ITEMS_PER_PAGE)
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages)
+    }
+  }, [users, currentPage])
+
   const handleRoleChange = async (id: number, newRole: string) => {
     const isConfirmed = window.confirm(`Вы уверены, что хотите изменить роль пользователя на "${newRole}"?`)
     if (!isConfirmed) return
 
     try {
       await api.user.changeRole(id, newRole)
-      await fetchUsers() // Обновляем список, чтобы увидеть изменения
+      await fetchUsers()
       toast.success(`Роль успешно изменена на ${newRole}`)
     } catch (err) {
       console.error(err)
-      toast.error('Не удалось изменить роль. Проверь консоль.')
+      toast.error('Не удалось изменить роль.')
     }
   }
 
@@ -55,12 +65,9 @@ export default function UsersPage() {
 
     try {
       await api.user.banUser(id)
-      
-      // Оптимистично или по факту обновляем флаг в стейте вручную
       setUsers(prevUsers => 
         prevUsers.map(u => u.id === id ? { ...u, isBanned: !u.isBanned } : u)
       )
-      
       toast.success('Статус блокировки изменен')
     } catch (err) {
       console.error(err)
@@ -86,17 +93,20 @@ export default function UsersPage() {
     }
   }
 
+  const totalPages = Math.ceil(users.length / ITEMS_PER_PAGE)
+  const paginatedUsers = users.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
+
   return (
     <ProtectedRoute>
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Шапка страницы */}
         <div className="flex justify-between items-center mb-6 gap-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">Пользователи системы</h1>
-            <p className="text-sm text-gray-500">Управление учетными записями, правами доступа и блокировками</p>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Пользователи системы</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Управление учетными записями, правами доступа и блокировками</p>
           </div>
-          
-          {/* Кнопка добавления доступна только админу */}
           {isAdmin && (
             <Button onClick={() => setIsFormOpen(true)} className="shrink-0">
               Добавить пользователя
@@ -104,78 +114,60 @@ export default function UsersPage() {
           )}
         </div>
 
-        {/* Модальное окно с формой */}
-        {isFormOpen && (
-          <UserForm 
-            onClose={() => setIsFormOpen(false)} 
-            onSuccess={fetchUsers} // Перезапросит список, и новый юзер сразу появится на экране
-          />
-        )}
+        {isFormOpen && <UserForm onClose={() => setIsFormOpen(false)} onSuccess={fetchUsers} />}
 
-        <div className="bg-white border rounded-lg shadow-sm divide-y">
+        <div className="bg-white dark:bg-zinc-900 border dark:border-zinc-800 rounded-lg shadow-sm divide-y dark:divide-zinc-800 mb-6">
           {loading ? (
-            <div className="p-8 text-center text-gray-500">Загрузка данных...</div>
+            <div className="p-8 text-center text-gray-500 dark:text-gray-400">Загрузка данных...</div>
           ) : users.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">Пользователи не найдены.</div>
+            <div className="p-8 text-center text-gray-500 dark:text-gray-400">Пользователи не найдены.</div>
           ) : (
-            users.map((userItem) => (
+            paginatedUsers.map((userItem) => (
               <div key={userItem.id} className="p-4 flex justify-between items-center gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <h3 className="font-semibold text-gray-900 truncate">
-                      {userItem.userName}
-                    </h3>
-                    
+                    <h3 className="font-semibold text-gray-900 dark:text-zinc-100 truncate">{userItem.userName}</h3>
                     <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
                       userItem.role === 'Administrator' 
-                        ? 'bg-red-50 text-red-700 ring-red-600/10' 
+                        ? 'bg-red-50 text-red-700 ring-red-600/10 dark:bg-red-950/40 dark:text-red-400 dark:ring-red-500/20' 
                         : userItem.role === 'Doctor'
-                        ? 'bg-blue-50 text-blue-700 ring-blue-700/10'
-                        : 'bg-gray-50 text-gray-600 ring-gray-500/10'
+                        ? 'bg-blue-50 text-blue-700 ring-blue-700/10 dark:bg-blue-950/40 dark:text-blue-400 dark:ring-blue-500/20'
+                        : 'bg-gray-50 text-gray-600 ring-gray-500/10 dark:bg-zinc-800 dark:text-zinc-400 dark:ring-zinc-700'
                     }`}>
                       {userItem.role}
                     </span>
-
                     {userItem.isBanned && (
-                      <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20">
+                      <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-950/40 dark:text-amber-400 dark:ring-amber-500/20">
                         Заблокирован
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-500 truncate">{userItem.email}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{userItem.email}</p>
                 </div>
                 
                 {isAdmin && (
                   <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                    {/* Селект выбора роли вместо ставого тоггла */}
                     <select
                       value={userItem.role}
                       onChange={(e) => handleRoleChange(userItem.id, e.target.value)}
-                      className="text-sm bg-white border border-gray-300 rounded-md px-2 py-1 h-9 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer text-gray-700 font-medium"
+                      className="text-sm bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 border border-gray-300 dark:border-zinc-700 rounded-md px-2 py-1 h-9 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer font-medium"
                     >
-                      <option value="Patient">Patient</option>
-                      <option value="Doctor">Doctor</option>
-                      <option value="Administrator">Administrator</option>
+                      <option value="Patient" className="bg-white dark:bg-zinc-800">Patient</option>
+                      <option value="Doctor" className="bg-white dark:bg-zinc-800">Doctor</option>
+                      <option value="Administrator" className="bg-white dark:bg-zinc-800">Administrator</option>
                     </select>
 
                     {userItem.role !== 'Administrator' && (
                       <Button
-                        variant="secondary"
-                        size="sm"
-                        // Админ не может забанить самого себя, а других — может, независимо от их роли
-                        disabled={userItem.id === currentUser?.id} 
+                        variant="secondary" size="sm" disabled={userItem.id === currentUser?.id} 
                         onClick={() => handleBanUser(userItem.id)}
+                        className="dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
                       >
                         {userItem.isBanned ? 'Разбан' : 'Бан'}
                       </Button>
                     )}
                     
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      disabled={userItem.id === currentUser?.id}
-                      onClick={() => handleDeleteUser(userItem.id)}
-                    >
+                    <Button variant="destructive" size="sm" disabled={userItem.id === currentUser?.id} onClick={() => handleDeleteUser(userItem.id)}>
                       Удалить
                     </Button>
                   </div>
@@ -184,6 +176,12 @@ export default function UsersPage() {
             ))
           )}
         </div>
+
+        <AppPagination  
+          currentPage={currentPage}  
+          totalPages={totalPages}  
+          onPageChange={setCurrentPage}
+        />
       </div>
     </ProtectedRoute>
   )

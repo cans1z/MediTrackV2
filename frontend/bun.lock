@@ -16,6 +16,7 @@
         "next": "16.2.7",
         "next-themes": "^0.4.6",
         "openapi-typescript": "^7.13.0",
+        "pagination": "^0.4.6",
         "radix-ui": "^1.4.3",
         "react": "19.2.4",
         "react-day-picker": "^10.0.1",
@@ -1267,6 +1268,8 @@
     "p-limit": ["p-limit@3.1.0", "", { "dependencies": { "yocto-queue": "^0.1.0" } }, "sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ=="],
 
     "p-locate": ["p-locate@5.0.0", "", { "dependencies": { "p-limit": "^3.0.2" } }, "sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw=="],
+
+    "pagination": ["pagination@0.4.6", "", {}, "sha512-TnZ3l17uuC5H9Wlc9FMYuEi65JlUCSn1ZAbnLnvUGkR7RgaFknUNGQTEumhjq1Jy1ePkXSiYUFFbHH70LGb9dA=="],
 
     "parent-module": ["parent-module@1.0.1", "", { "dependencies": { "callsites": "^3.0.0" } }, "sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g=="],
 

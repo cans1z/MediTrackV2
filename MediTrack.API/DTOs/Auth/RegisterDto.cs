@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using MediTrack.API.Models;
 
 namespace MediTrack.API.DTOs;
 
@@ -6,11 +7,12 @@ public class RegisterDto
 {
     [Required]
     [MinLength(3)]
-    public string Name { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
     [Required]
     [EmailAddress]
     public string Email { get; set; }  = string.Empty;
     [Required]
     [MinLength(6)]
     public string Password { get; set; } = string.Empty;
+    public UserRole Role { get; set; } = UserRole.Patient;
 }

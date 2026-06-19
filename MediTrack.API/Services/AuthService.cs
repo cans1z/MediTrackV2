@@ -22,21 +22,21 @@ public class AuthService : IAuthService
     public async Task<UserResponseDto> Register(RegisterDto dto)
     {
         var userExists = await _context.Users
-            .AnyAsync(u => u.UserName.ToLower() == dto.Name.ToLower() || u.Email.ToLower() == dto.Email.ToLower());
+            .AnyAsync(u => u.UserName.ToLower() == dto.UserName.ToLower() || u.Email.ToLower() == dto.Email.ToLower());
 
         if (userExists)
         {
-            throw new ConflictException($"User with name {dto.Name} or email {dto.Email} already exists");
+            throw new ConflictException($"User with name {dto.UserName} or email {dto.Email} already exists");
         }
 
         string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
         var newUser = new User
         {
-            UserName = dto.Name,
+            UserName = dto.UserName,
             Email = dto.Email,
             PasswordHash = passwordHash,
-            Role = UserRole.Patient
+            Role = dto.Role
         };
         
         await _context.Users.AddAsync(newUser);

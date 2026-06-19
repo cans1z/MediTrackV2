@@ -1,6 +1,7 @@
 ﻿using MediTrack.API.DTOs;
 using MediTrack.API.Exceptions;
 using MediTrack.API.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediTrack.API.Controllers;
@@ -17,6 +18,7 @@ public class AuthController : ControllerBase
     }
     
     [HttpPost("register")]
+    [Authorize(Roles = "Administrator")]
     public async Task<ActionResult<UserResponseDto>> Register([FromBody] RegisterDto dto)
     {
         var user = await _authService.Register(dto);
@@ -29,4 +31,7 @@ public class AuthController : ControllerBase
         var token = await _authService.Login(dto);
         return Ok(token);
     }
+    
+  
+    
 }

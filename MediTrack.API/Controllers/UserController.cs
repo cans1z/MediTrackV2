@@ -19,6 +19,15 @@ public class UserController : ControllerBase
         _userService = userService;
     }
     
+    [HttpGet("me")]
+    public async Task<ActionResult<UserResponseDto>> GetMe()
+    {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var role = Enum.Parse<UserRole>(User.FindFirstValue(ClaimTypes.Role)!);
+        var user = await _userService.GetUser(userId, userId, role);
+        return Ok(user);
+    }
+    
     [Authorize]
     [HttpGet("{id}")]
     public async Task<ActionResult<UserResponseDto>> GetUser(int id)
